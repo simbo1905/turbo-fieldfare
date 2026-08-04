@@ -2,17 +2,17 @@ import Testing
 @testable import TurboFieldfareCLICore
 
 @Suite struct CLIArgumentsTests {
-    @Test func defaultsUseProductionGenerationValues() throws {
+    @Test func defaultsUseGemmaSummaryProfileValues() throws {
         let arguments = try Args.parse(["--model", "m.gturbo", "--prompt", "hi"])
         #expect(arguments.model == "m.gturbo")
         #expect(arguments.prompt == "hi")
         #expect(arguments.messagesFile == nil)
-        #expect(arguments.maxNew == 1_024)
+        #expect(arguments.maxNew == Args.remainingContext)
         #expect(arguments.maxContext == 4096)
-        #expect(arguments.temperature == 0.2)
+        #expect(arguments.temperature == 1)
         #expect(arguments.topK == 64)
         #expect(arguments.topP == 0.95)
-        #expect(arguments.repetitionPenalty == 1)
+        #expect(arguments.repetitionPenalty == 1.1)
         #expect(arguments.seed == nil)
         #expect(arguments.stops.isEmpty)
         #expect(!arguments.quiet)
@@ -21,13 +21,13 @@ import Testing
     @Test func generationOptionsParseAndStopsRepeat() throws {
         let arguments = try Args.parse([
             "--model", "m.gturbo", "--prompt", "hi",
-            "--max-new", "32", "--max-context", "512",
+            "--max-new", "32", "--max-context", "4096",
             "--temperature", "0", "--top-k", "40", "--top-p", "0.95",
             "--repetition-penalty", "1.1", "--seed", "42",
             "--stop", "A", "--stop", "B", "--quiet",
         ])
         #expect(arguments.maxNew == 32)
-        #expect(arguments.maxContext == 512)
+        #expect(arguments.maxContext == 4096)
         #expect(arguments.temperature == 0)
         #expect(arguments.topK == 40)
         #expect(arguments.topP == 0.95)
@@ -35,6 +35,27 @@ import Testing
         #expect(arguments.seed == 42)
         #expect(arguments.stops == ["A", "B"])
         #expect(arguments.quiet)
+    }
+
+    @Test func acceptsOnlyDocumentedContextLengths() throws {
+        for context in Args.supportedContexts {
+            let arguments = try Args.parse([
+                "--model", "m.gturbo", "--prompt", "hi", "--max-context", "\(context)",
+            ])
+            #expect(arguments.maxContext == context)
+        }
+        #expect(throws: ArgsError.invalidValue(flag: "--max-context", value: "512")) {
+            _ = try Args.parse(["--model", "m.gturbo", "--prompt", "hi", "--max-context", "512"])
+        }
+    }
+
+    @Test func maxNewAcceptsAnyPositiveRequestedLimit() throws {
+        for maxNew in [1, 32, 1_024] {
+            let arguments = try Args.parse([
+                "--model", "m.gturbo", "--prompt", "hi", "--max-new", "\(maxNew)",
+            ])
+            #expect(arguments.maxNew == maxNew)
+        }
     }
 
     @Test func topKZeroRequiresTopPToBeDisabled() throws {

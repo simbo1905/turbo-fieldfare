@@ -1,4 +1,6 @@
 public struct Args: Equatable, Sendable {
+    public static let supportedContexts = [4_096, 8_192, 16_384, 32_768, 65_536]
+    public static let remainingContext = Int.max
     public var model: String
     public var prompt: String?
     public var messagesFile: String?
@@ -15,12 +17,12 @@ public struct Args: Equatable, Sendable {
     public init(model: String,
                 prompt: String? = nil,
                 messagesFile: String? = nil,
-                maxNew: Int = 1_024,
+                maxNew: Int = Args.remainingContext,
                 maxContext: Int = 4096,
-                temperature: Float = 0.2,
+                temperature: Float = 1.0,
                 topK: Int? = 64,
                 topP: Float? = 0.95,
-                repetitionPenalty: Float = 1.0,
+                repetitionPenalty: Float = 1.1,
                 seed: UInt64? = nil,
                 stops: [String] = [],
                 quiet: Bool = false) {
@@ -73,12 +75,12 @@ extension Args {
       --messages-file <path>    JSON chat messages with role and content fields.
 
     options:
-      --max-new <int>           Generated-token limit (default 1024).
+      --max-new <int>           Generated-token limit (default: remaining context).
       --max-context <int>       Context limit in tokens (default 4096).
-      --temperature <float>     Sampling temperature (default 0.2; 0 = greedy).
+      --temperature <float>     Sampling temperature (default 1.0; 0 = greedy).
       --top-k <int>             Top-k truncation, 1...256 (default 64; 0 = off).
       --top-p <float>           Nucleus truncation (default 0.95).
-      --repetition-penalty <f>  Repetition penalty (default 1.0).
+      --repetition-penalty <f>  Repetition penalty (default 1.1).
       --seed <uint64>           Deterministic sampling seed (default off).
       --stop <string>           Stop substring (repeatable).
       --quiet                   Suppress the timing footer.
@@ -89,12 +91,12 @@ extension Args {
         var model: String?
         var prompt: String?
         var messagesFile: String?
-        var maxNew = 1_024
+        var maxNew = Args.remainingContext
         var maxContext = 4096
-        var temperature: Float = 0.2
+        var temperature: Float = 1.0
         var topK: Int? = 64
         var topP: Float? = 0.95
-        var repetitionPenalty: Float = 1.0
+        var repetitionPenalty: Float = 1.1
         var seed: UInt64?
         var stops: [String] = []
         var quiet = false
@@ -122,7 +124,7 @@ extension Args {
                 maxNew = parsed
             case "--max-context":
                 let value = try takeValue(argv, &index, flag: flag)
-                guard let parsed = Int(value), parsed > 0 else {
+                guard let parsed = Int(value), Args.supportedContexts.contains(parsed) else {
                     throw ArgsError.invalidValue(flag: flag, value: value)
                 }
                 maxContext = parsed
