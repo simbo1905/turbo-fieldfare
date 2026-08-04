@@ -1,0 +1,7 @@
+{
+  "course_root": "/replace/with/confidential/course/root",
+  "model_dir": "scratch/gemma4.gturbo",
+  "results_root": ".tmp/confidential-gemma4-comparison",
+  "summary_prompt": "Summarise the following instructional transcript faithfully and concisely. Preserve substantive facts, figures, and recommendations.",
+  "timeout_seconds": 1800
+}

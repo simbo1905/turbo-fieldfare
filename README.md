@@ -222,14 +222,15 @@ swift run -c release TurboFieldfareCLI \
   --messages-file messages.json
 ```
 
-This formats messages in the same way as the Mac app. The CLI response limit
-is set with `--max-new`, which defaults to 1,024 tokens. The Mac app can
-generate until the selected context window is full.
+This formats messages in the same way as the Mac app. Unless `--max-new` is
+set, the CLI uses all context remaining after the prompt. Its Gemma 4 profile
+uses a 4K context, temperature 1.0, Top-K 64, Top-P 0.95, and repetition
+penalty 1.1. The Mac app keeps its separate interactive defaults.
 
 Common generation options include `--max-context`, `--temperature`, `--top-k`,
 `--top-p`, `--repetition-penalty`, `--seed`, and repeatable `--stop` strings.
-The public CLI uses production runtime defaults. Run the following command for
-the complete option list:
+The CLI accepts 4K, 8K, 16K, 32K, or 64K contexts. Run the following command
+for the complete option list:
 
 ```bash
 swift run -c release TurboFieldfareCLI --help

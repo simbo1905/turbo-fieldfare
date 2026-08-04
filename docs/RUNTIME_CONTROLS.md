@@ -10,11 +10,12 @@ The Mac app and CLI expose these generation controls:
 
 | Control | Mac values | CLI flag | Default | Effect |
 | --- | --- | --- | --- | --- |
-| Maximum response | Automatic | `--max-new` | App: remaining context; CLI: 1,024 tokens | The app can use the context space left after formatting the prompt. The CLI uses its explicit or default `--max-new` limit. |
+| Maximum response | Automatic | `--max-new` | remaining context | The app and CLI can use the context space left after formatting the prompt; `--max-new` limits the CLI explicitly. |
 | Maximum context | 4K, 8K, 16K, 32K, 64K | `--max-context` | 4K | Sets prompt plus response capacity. The app shows the FP16 KV-memory delta. |
-| Temperature | 0...2 in 0.05 steps | `--temperature` | 0.2 | `0` is greedy; positive values sample. |
+| Temperature | 0...2 in 0.05 steps | `--temperature` | App: 0.2; CLI: 1.0 | `0` is greedy; positive values sample. |
 | Top-K | Off or 1...256 | `--top-k` | 64 | Keeps at most K candidates. CLI `0` turns it off. |
 | Top-P | Off or 0.01...1 | `--top-p` | 0.95 | Applies nucleus truncation before Top-K and is effective only while Top-K is enabled. |
+| Repetition penalty | 1... | `--repetition-penalty` | App: 1.0; CLI: 1.1 | Penalizes recently repeated tokens. |
 
 With positive temperature, a CLI Top-P below `1` requires Top-K between `1`
 and `256`. To disable both truncation controls, pass `--top-k 0 --top-p 1`.
