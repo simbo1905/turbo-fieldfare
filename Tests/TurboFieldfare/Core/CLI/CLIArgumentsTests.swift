@@ -9,10 +9,10 @@ import Testing
         #expect(arguments.messagesFile == nil)
         #expect(arguments.maxNew == Args.remainingContext)
         #expect(arguments.maxContext == 4096)
-        #expect(arguments.temperature == 1)
+        #expect(arguments.temperature == 0.2)
         #expect(arguments.topK == 64)
         #expect(arguments.topP == 0.95)
-        #expect(arguments.repetitionPenalty == 1.1)
+        #expect(arguments.repetitionPenalty == 1.0)
         #expect(arguments.seed == nil)
         #expect(arguments.stops.isEmpty)
         #expect(!arguments.quiet)
@@ -85,7 +85,10 @@ import Testing
         let expected: Set<String> = [
             "--model", "--prompt", "--messages-file", "--max-new", "--max-context",
             "--temperature", "--top-k", "--top-p", "--repetition-penalty",
-            "--seed", "--stop", "--quiet", "--help",
+            "--seed", "--stop", "--quiet",
+            "--expert-cache-slots", "--expert-cache-policy",
+            "--prefill", "--prefill-chunk-tokens", "--rdadvise",
+            "--help",
         ]
         let words = Args.usage.split { $0.isWhitespace || $0 == "(" || $0 == ")" }
         let options = Set(words.map(String.init).filter { $0.hasPrefix("--") })
@@ -124,5 +127,76 @@ import Testing
                 "--messages-file", "chat.json",
             ])
         }
+    }
+
+    @Test func expertCacheSlotsAcceptsAllowedValues() throws {
+        for slots in [8, 16, 24, 32] {
+            let arguments = try Args.parse([
+                "--model", "m.gturbo", "--prompt", "hi", "--expert-cache-slots", "\(slots)",
+            ])
+            #expect(arguments.expertCacheSlots == slots)
+        }
+        #expect(throws: ArgsError.invalidValue(flag: "--expert-cache-slots", value: "7")) {
+            _ = try Args.parse(["--model", "m.gturbo", "--prompt", "hi", "--expert-cache-slots", "7"])
+        }
+    }
+
+    @Test func expertCachePolicyAcceptsAllowedValues() throws {
+        for policy in ["lfu", "lru"] {
+            let arguments = try Args.parse([
+                "--model", "m.gturbo", "--prompt", "hi", "--expert-cache-policy", policy,
+            ])
+            #expect(arguments.expertCachePolicy == policy)
+        }
+        #expect(throws: ArgsError.invalidValue(flag: "--expert-cache-policy", value: "fifo")) {
+            _ = try Args.parse(["--model", "m.gturbo", "--prompt", "hi", "--expert-cache-policy", "fifo"])
+        }
+    }
+
+    @Test func prefillAcceptsOnOrOff() throws {
+        let on = try Args.parse([
+            "--model", "m.gturbo", "--prompt", "hi", "--prefill", "on",
+        ])
+        #expect(on.prefillEnabled)
+        let off = try Args.parse([
+            "--model", "m.gturbo", "--prompt", "hi", "--prefill", "off",
+        ])
+        #expect(!off.prefillEnabled)
+        #expect(throws: ArgsError.invalidValue(flag: "--prefill", value: "yes")) {
+            _ = try Args.parse(["--model", "m.gturbo", "--prompt", "hi", "--prefill", "yes"])
+        }
+    }
+
+    @Test func prefillChunkTokensAcceptsAllowedValues() throws {
+        for tokens in [32, 64, 128] {
+            let arguments = try Args.parse([
+                "--model", "m.gturbo", "--prompt", "hi", "--prefill-chunk-tokens", "\(tokens)",
+            ])
+            #expect(arguments.prefillChunkTokens == tokens)
+        }
+        #expect(throws: ArgsError.invalidValue(flag: "--prefill-chunk-tokens", value: "256")) {
+            _ = try Args.parse(["--model", "m.gturbo", "--prompt", "hi", "--prefill-chunk-tokens", "256"])
+        }
+    }
+
+    @Test func rdadviseAcceptsAllowedValues() throws {
+        for policy in ["off", "default", "bounded", "adaptive"] {
+            let arguments = try Args.parse([
+                "--model", "m.gturbo", "--prompt", "hi", "--rdadvise", policy,
+            ])
+            #expect(arguments.rdadvisePolicy == policy)
+        }
+        #expect(throws: ArgsError.invalidValue(flag: "--rdadvise", value: "aggressive")) {
+            _ = try Args.parse(["--model", "m.gturbo", "--prompt", "hi", "--rdadvise", "aggressive"])
+        }
+    }
+
+    @Test func runtimeFlagsDefaultToProductionValues() throws {
+        let arguments = try Args.parse(["--model", "m.gturbo", "--prompt", "hi"])
+        #expect(arguments.expertCacheSlots == 16)
+        #expect(arguments.expertCachePolicy == "lfu")
+        #expect(arguments.prefillEnabled)
+        #expect(arguments.prefillChunkTokens == 128)
+        #expect(arguments.rdadvisePolicy == "off")
     }
 }
