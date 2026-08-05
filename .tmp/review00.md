@@ -1,3 +1,0 @@
-# review00 — identical Ollama summary task
-
-Work only on review finding P1 about `process_chunks_ollama.py`. Use Red/Green TDD: first add a fixture/fake-HTTP test proving the request prepends the supplied summary instruction to the transcript without adding Ollama sampling/context options; run it red; implement `--prompt` and pass the same configured instruction from `private_benchmark.py`; run focused tests green. Use only executable `uv run --script` Python tooling, never raw `python3`. Do not access the private corpus, run a model, or call a paid endpoint. Report exact files/tests; do not commit. The root agent will inspect and stage.
