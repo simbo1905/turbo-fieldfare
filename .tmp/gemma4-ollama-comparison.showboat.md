@@ -118,3 +118,11 @@ ollama chunk=09 context=4096 status=ok wall_seconds=55.404 peak_rss_mib=18557.1 
 ```
 
 The benchmark-owned `gemma4:26b` instance was then stopped; `ollama ps` was clear.
+
+```bash
+uv run --script summarisation/showboat/private_benchmark.py measure ollama 10
+```
+
+```output
+ollama chunk=10 context=4096 status=ok wall_seconds=63.130 peak_rss_mib=18514.0 memory_free_before=72 memory_free_after=9
+```
