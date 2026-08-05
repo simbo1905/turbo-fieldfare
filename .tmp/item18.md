@@ -2,8 +2,8 @@
 
 ## Status
 
-In progress. The user resumed execution after the rebased branch was pushed to
-the fork at `b4d86d6`.
+Blocked. The user resumed execution after the rebased branch was pushed to the
+fork at `b4d86d6`, but stock TurboFieldfare stopped at chunk48.
 
 ## Objective
 
@@ -29,6 +29,22 @@ competitively fast, and aggressive tuning could damage large-prompt output.
 Before the full run, verify that the largest generated chunk fits the stock
 TurboFieldfare context budget. Stop and report if it does not fit; do not alter
 the submitted defaults silently.
+
+## Recorded blocker
+
+- Corpus preparation completed: 111 Markdown files, 617,063 source bytes, and
+  61 deterministic 11K/10K chunks.
+- Stock Ollama completed 61/61 chunks without errors.
+- Stock TurboFieldfare completed chunks 00 through 47, then rejected chunk48
+  before generation with exit code 2: prompt 4,673 tokens reaches stock
+  `maxContext` 4,096.
+- Chunk48 is 11,020 bytes, so byte-window size is not a reliable proxy for its
+  tokenizer length.
+- Ollama was unloaded before the TF pass; `ollama ps` was empty.
+
+The run is intentionally stopped. Continuing requires an explicit user choice:
+use a larger TF context override, reduce/rebuild the shared chunks, or narrow
+the comparison corpus. Do not choose or apply one silently.
 
 ## Required machine preflight
 
@@ -97,6 +113,6 @@ failure rather than rerunning with changed settings.
 - [ ] Preflight passes without protocol deviations.
 - [ ] Ollama completes all 61 chunks with stock settings and no warmup.
 - [ ] Ollama has no loaded model before TurboFieldfare starts; an idle daemon is acceptable.
-- [ ] The submitted stock CLI completes all 61 matching chunks.
+- [ ] The submitted stock CLI completes all 61 matching chunks (blocked at 48/61).
 - [ ] Every response, timing record, and error record is preserved privately.
 - [ ] Sanity checks find no catastrophic runner/output failure.
