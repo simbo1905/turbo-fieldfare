@@ -58,3 +58,11 @@ measurement=$(find .tmp -type f -path "*/measured/ollama/context-4096/chunk-02/m
 ```output
 ollama chunk=02 context=4096 exit=0 wall_seconds=73 peak_rss_mib=18549 memory_free_before=77 memory_free_after=9
 ```
+
+```bash
+uv run --script summarisation/showboat/private_benchmark.py measure ollama 3
+```
+
+```output
+ollama chunk=03 context=4096 status=ok wall_seconds=65.837 peak_rss_mib=18508.8 memory_free_before=75 memory_free_after=8
+```
