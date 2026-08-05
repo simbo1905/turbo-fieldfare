@@ -28,7 +28,7 @@ review08. [done] Record complete private measurement provenance and publish only
 09. [done] TurboFieldfare measured chunk 07.
 10. [done] TurboFieldfare measured chunk 08.
 11. [done] TurboFieldfare measured chunk 09.
-12. TurboFieldfare measured chunk 10.
+12. [done] TurboFieldfare measured chunk 10.
 13. TurboFieldfare measured chunk 11.
 14. Ollama discarded warmup on chunk 00.
 15. Ollama measured chunk 00.

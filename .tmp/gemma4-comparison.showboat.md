@@ -144,3 +144,11 @@ uv run --script summarisation/showboat/private_benchmark.py measure turbofieldfa
 ```output
 turbofieldfare chunk=09 context=4096 status=ok wall_seconds=77.759 peak_rss_mib=1585.9 memory_free_before=47 memory_free_after=42
 ```
+
+```bash
+uv run --script summarisation/showboat/private_benchmark.py measure turbofieldfare 10 --context 4096
+```
+
+```output
+turbofieldfare chunk=10 context=4096 status=ok wall_seconds=76.280 peak_rss_mib=1582.5 memory_free_before=47 memory_free_after=40
+```
