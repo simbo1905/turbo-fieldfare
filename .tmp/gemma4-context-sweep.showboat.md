@@ -79,3 +79,26 @@ uv run --script summarisation/showboat/private_benchmark.py measure turbofieldfa
 ```output
 turbofieldfare chunk=06 context=32768 status=ok wall_seconds=53.812 peak_rss_mib=1710.0 memory_free_before=67 memory_free_after=61
 ```
+
+Item 31: one TurboFieldfare context-sweep measurement of the private largest chunk at context 65536. Sampling configuration remains fixed (temperature 1.0, Top-K 64, Top-P 0.95, repetition penalty 1.0); no other model workload is active. Immediately before launch the private runner repeats the complete AGENTS.md model gate and owns a finite process-group timeout.
+
+```bash
+jq '{backend, chunk, context, series, warmup, exit_code, wall_seconds, peak_rss_mib, memory_free_before_percent, memory_free_after_percent, output_bytes, runner_error}' .tmp/confidential-gemma4-comparison/sweep/measured/turbofieldfare/context-65536/chunk-06/measurement.json
+```
+
+```output
+{
+  "backend": "turbofieldfare",
+  "chunk": 6,
+  "context": 65536,
+  "series": "sweep",
+  "warmup": false,
+  "exit_code": 0,
+  "wall_seconds": 59.226463166065514,
+  "peak_rss_mib": 1632.640625,
+  "memory_free_before_percent": 61,
+  "memory_free_after_percent": 61,
+  "output_bytes": 3179,
+  "runner_error": null
+}
+```
