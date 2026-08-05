@@ -311,13 +311,36 @@ def launch(command: list[str], stdout: Path, stderr: Path, timeout_seconds: int,
         return process.returncode, time.monotonic() - started, peak
 
 
-def run_one(config: dict, root: Path, backend: str, chunk: int, context: int, warmup: bool) -> None:
+def largest_chunk(manifest: dict) -> int:
+    """Return the anonymous index of the largest selected chunk."""
+    chunks = manifest.get("chunks")
+    if not isinstance(chunks, list) or not chunks:
+        raise ValueError("benchmark manifest has no chunks")
+    try:
+        return max(range(len(chunks)), key=lambda index: int(chunks[index]["bytes"]))
+    except (KeyError, TypeError, ValueError) as error:
+        raise ValueError("benchmark manifest has invalid chunk sizes") from error
+
+
+def run_one(config: dict, root: Path, backend: str, chunk: int | None, context: int, warmup: bool, series: str = "primary", use_largest: bool = False) -> None:
     if context not in {4096, 8192, 16384, 32768, 65536}:
         raise ValueError("unsupported context")
     manifest = json.loads((root / "corpus" / "manifest.json").read_text(encoding="utf-8"))
+    if use_largest:
+        if chunk is not None:
+            raise ValueError("choose either a chunk or --largest")
+        chunk = largest_chunk(manifest)
+    if chunk is None:
+        raise ValueError("a chunk or --largest is required")
     if not 0 <= chunk < len(manifest["chunks"]):
         raise ValueError("invalid chunk index")
-    run_root = root / ("warmup" if warmup else "measured") / backend / f"context-{context}" / f"chunk-{chunk:02d}"
+    if series not in {"primary", "sweep"}:
+        raise ValueError("unsupported result series")
+    # Primary results retain their original layout. Sweep artifacts are kept
+    # wholly separate so a discarded 4K warmup can never collide with its
+    # primary counterpart or a later measured variation.
+    series_root = root if series == "primary" else root / "sweep"
+    run_root = series_root / ("warmup" if warmup else "measured") / backend / f"context-{context}" / f"chunk-{chunk:02d}"
     if run_root.exists():
         raise RuntimeError("result already exists")
     source, output = root / "corpus" / f"benchmark{chunk:02d}.md", run_root / "summary.md"
@@ -356,6 +379,7 @@ def run_one(config: dict, root: Path, backend: str, chunk: int, context: int, wa
         "backend": backend,
         "chunk": chunk,
         "context": context,
+        "series": series,
         "warmup": warmup,
         "started_at": started_at,
         "finished_at": utc_timestamp(),
@@ -426,8 +450,10 @@ def main(argv: list[str] | None = None) -> int:
     for name in ("warmup", "measure"):
         action = sub.add_parser(name)
         action.add_argument("backend", choices=["turbofieldfare", "ollama"])
-        action.add_argument("chunk", type=int)
+        action.add_argument("chunk", type=int, nargs="?")
+        action.add_argument("--largest", action="store_true", help="select the largest manifest chunk; only its anonymous index is reported")
         action.add_argument("--context", type=int, default=4096)
+        action.add_argument("--series", choices=["primary", "sweep"], default="primary", help="write sweep artifacts beneath a separate private directory")
     public = sub.add_parser("public-report")
     public.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
@@ -439,7 +465,7 @@ def main(argv: list[str] | None = None) -> int:
     elif args.action == "prepare":
         prepare(config, root)
     elif args.action in {"warmup", "measure"}:
-        run_one(config, root, args.backend, args.chunk, args.context, args.action == "warmup")
+        run_one(config, root, args.backend, args.chunk, args.context, args.action == "warmup", args.series, args.largest)
     else:
         report(root, args.output)
     return 0

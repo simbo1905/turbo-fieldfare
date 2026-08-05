@@ -43,6 +43,7 @@ review08. [done] Record complete private measurement provenance and publish only
 24. [done] Ollama measured chunk 09.
 25. [done] Ollama measured chunk 10.
 26. [done] Ollama measured chunk 11.
+27w. [done] Discarded TurboFieldfare context-sweep warmup on the largest private chunk at 4096.
 27. Largest private chunk, TurboFieldfare context 4096.
 28. Largest private chunk, TurboFieldfare context 8192.
 29. Largest private chunk, TurboFieldfare context 16384.
