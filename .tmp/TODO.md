@@ -19,7 +19,7 @@ review08. [done] Record complete private measurement provenance and publish only
 00. [done] Bootstrap private config, privacy-safe preflight, initialize notebook.
 01. [done] Prepare corpus; TurboFieldfare discarded warmup on chunk 00.
 02. [done] TurboFieldfare measured chunk 00.
-03. TurboFieldfare measured chunk 01.
+03. [done] TurboFieldfare measured chunk 01.
 04. TurboFieldfare measured chunk 02.
 05. TurboFieldfare measured chunk 03.
 06. TurboFieldfare measured chunk 04.
