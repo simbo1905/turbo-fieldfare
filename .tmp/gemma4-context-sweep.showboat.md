@@ -69,3 +69,13 @@ Item 29 reconciliation: the private sweep artifact already contains one valid co
 ```output
 {"backend": "turbofieldfare", "chunk": 6, "context": 16384, "exit_code": 0, "memory_free_after_percent": 62, "memory_free_before_percent": 68, "output_bytes": 3243, "peak_rss_mib": 1648.359375, "runner_error": null, "series": "sweep", "wall_seconds": 59.47545083286241, "warmup": false}
 ```
+
+Item 30: one TurboFieldfare context-sweep measurement of the private largest chunk at context 32768. Sampling configuration remains fixed (temperature 1.0, Top-K 64, Top-P 0.95, repetition penalty 1.0); no other model workload is active. Immediately before launch the private runner repeats the complete AGENTS.md model gate and owns a finite process-group timeout.
+
+```bash
+uv run --script summarisation/showboat/private_benchmark.py measure turbofieldfare --largest --context 32768 --series sweep
+```
+
+```output
+turbofieldfare chunk=06 context=32768 status=ok wall_seconds=53.812 peak_rss_mib=1710.0 memory_free_before=67 memory_free_after=61
+```
