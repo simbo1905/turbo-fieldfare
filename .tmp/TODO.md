@@ -1,8 +1,8 @@
 # Serial Showboat execution ledger
 
-No model run has occurred. Every item must be executed independently, through
-Showboat, with its own task/subagent, finite timeout, resource check, and
-`git add -f .tmp/gemma4-comparison.showboat.md` after a successful append.
+TurboFieldfare items 01–13 are recorded in `.tmp/gemma4-comparison.showboat.md`.
+Every remaining item must be executed independently, with its own fresh agent,
+finite timeout, resource check, and a staged Showboat notebook append.
 
 Review remediation gates (complete with Red/Green tests before item 00):
 
@@ -30,7 +30,7 @@ review08. [done] Record complete private measurement provenance and publish only
 11. [done] TurboFieldfare measured chunk 09.
 12. [done] TurboFieldfare measured chunk 10.
 13. [done] TurboFieldfare measured chunk 11.
-14. Ollama discarded warmup on chunk 00.
+14. [done] Ollama discarded warmup on chunk 00.
 15. Ollama measured chunk 00.
 16. Ollama measured chunk 01.
 17. Ollama measured chunk 02.
