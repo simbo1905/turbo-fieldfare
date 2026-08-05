@@ -3,7 +3,7 @@
 ## Status
 
 In progress. The user resumed execution after the rebased branch was pushed to
-the fork at `b4d86d6`; TurboFieldfare resumes at chunk48 with a 16K context.
+the fork at `b4d86d6`; comparison uses the original stock 4K context.
 
 ## Objective
 
@@ -42,9 +42,12 @@ the submitted defaults silently.
   tokenizer length.
 - Ollama was unloaded before the TF pass; `ollama ps` was empty.
 
-The user selected the stock-supported `--max-context 16384` setting. Resume at
-chunk48 without rerunning completed chunks. Keep temperature, Top-K, Top-P,
-repetition penalty, max-new, and all five runtime controls at shipped defaults.
+`chunk48` is blacklisted from both backend output sets because its 4,673-token
+prompt cannot fit the stock 4K TF context. A 16K retry was started only to
+confirm the setting works, then aborted after its first output; it is not part
+of the comparison. Resume chunks 49–60 at the original 4K setting. Keep
+temperature, Top-K, Top-P, repetition penalty, max-new, and all five runtime
+controls at shipped defaults.
 
 ## Required machine preflight
 
@@ -84,8 +87,9 @@ and inform the user.
 ## TurboFieldfare pass
 
 1. Use `.build/release/TurboFieldfareCLI` built from the rebased branch.
-2. Pass `--max-context 16384` so every shared 11K chunk fits. Do not pass any
-   of the five new runtime options or override generation settings.
+2. Retain the stock 4K context. Blacklist chunks that do not fit rather than
+   changing the comparison settings. Do not pass any of the five new runtime
+   options or override generation settings.
 3. Process the same chunks 00 through 60 once, in the same order.
 4. Run one CLI process at a time and never overlap model processes.
 5. Record per chunk: exact command shape with private paths redacted, exit code,
@@ -113,7 +117,7 @@ failure rather than rerunning with changed settings.
 - [ ] Preflight passes without protocol deviations.
 - [ ] Ollama completes all 61 chunks with stock settings and no warmup.
 - [ ] Ollama has no loaded model before TurboFieldfare starts; an idle daemon is acceptable.
-- [ ] The submitted CLI completes all 61 matching chunks with the stock-supported
-      16K context setting (48/61 complete before the resume).
+- [ ] The submitted CLI completes the 60 matching chunks at stock 4K; chunk48
+      is excluded from both sides because it does not fit.
 - [ ] Every response, timing record, and error record is preserved privately.
 - [ ] Sanity checks find no catastrophic runner/output failure.

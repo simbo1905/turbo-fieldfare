@@ -13,14 +13,18 @@ inferior on the supplied source.
 
 ## Sample
 
-- Select exactly 12 chunks evenly across ordered indices 00 through 60.
+- Exclude `chunk48`, which does not fit stock 4K TurboFieldfare, from both
+  backend sets before selection.
+- Select exactly 12 chunks evenly across the remaining ordered comparable
+  indices.
 - Compute and record the selection algorithm before judging.
 - Reuse the original 11K-window chunks and full outputs from item18.
 - Do not substitute the earlier 1K speed-test blocks.
 
-A suitable deterministic index rule is to round 12 equally spaced points from
-0 through 60, then verify it produces 12 unique indices including both ends.
-Store the resulting indices in the panel manifest before making judge calls.
+A suitable deterministic rule is to select 12 equally spaced positions from the
+ordered 60 eligible indices, then verify it produces 12 unique indices
+including both ends. Store the resulting indices in the panel manifest before
+making judge calls.
 
 ## Calls
 
