@@ -126,3 +126,13 @@ uv run --script summarisation/showboat/private_benchmark.py measure turbofieldfa
 ```output
 turbofieldfare chunk=07 context=4096 status=ok wall_seconds=75.639 peak_rss_mib=1587.5 memory_free_before=48 memory_free_after=43
 ```
+
+```bash
+uv run --script summarisation/showboat/private_benchmark.py measure turbofieldfare 8 --context 4096
+```
+
+```output
+turbofieldfare chunk=08 context=4096 status=ok wall_seconds=73.131 peak_rss_mib=1584.6 memory_free_before=46 memory_free_after=42
+```
+
+Item 10 completed: TurboFieldfare anonymous chunk 08 at context 4096 exited 0; wall time 73.131 seconds; peak apparent RSS 1584.6 MiB; free memory 46% to 42%. The model-owner check is clear after completion. The one model invocation was preflight-gated and had an owned finite process-group timeout.
