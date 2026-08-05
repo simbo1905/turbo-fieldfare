@@ -8,13 +8,14 @@ or quality: the comparison is a real-user-path comparison.
 
 ## Safety and prerequisites
 
-Do not run this workflow while another TurboFieldfare, Ollama, or model-owning
-process is active. Before a model pass, follow this repository's `AGENTS.md`:
-macOS 26+, Swift 6.2+, sufficient disk, acceptable `memory_pressure -Q`, a
-completed `scratch/gemma4.gturbo`, and no matching model owner. The course is
-external and read-only. Select output roots outside both the course and this
-repository. Do not stop or replace an existing owner, and run one model-owning
-workload at a time.
+Do not run this workflow while another TurboFieldfare or model-owning workload
+is active. Before a model pass, follow this repository's `AGENTS.md`: macOS
+26+, Swift 6.2+, sufficient disk, acceptable `memory_pressure -Q`, a completed
+`scratch/gemma4.gturbo`, and no matching model owner. Before a TurboFieldfare
+measurement, `ollama ps` must show no loaded Ollama model; an idle `ollama serve`
+daemon is allowed. The course is external and read-only. Select output roots
+outside both the course and this repository. Do not stop or replace an existing
+owner, and run one model-owning workload at a time.
 
 The scripts are intentionally opt-in. Unit tests use local fixtures and a fake
 HTTP server; they do not access a course, start a model, request Ollama

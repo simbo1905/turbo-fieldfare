@@ -44,7 +44,7 @@ the server is needed, and stop only a server you launched.
 
 Before a model run, require macOS 26+, Swift 6.2+, enough disk, acceptable `memory_pressure -Q`, a completed `scratch/gemma4.gturbo`, and no process from `pgrep -fl 'TurboFieldfareServer|TurboFieldfareMac|TurboFieldfareDecodeService|TurboFieldfareCLI|TurboFieldfarePackageTests|swiftpm-testing-helper|mlx_lm|mlx-lm'`. If a check fails, inform the user and stop; do not terminate apps or delete or reinstall the model.
 
-Before every TurboFieldfare measurement, Ollama must be completely stopped and verified gone (`pgrep -fl ollama` must return nothing). Ollama's ~18 GiB resident footprint contaminates every TF timing and memory result. Kill it with `ollama stop gemma4:26b; kill $(pgrep ollama) 2>/dev/null`.
+Before every TurboFieldfare measurement, no Ollama model may be loaded. Check `ollama ps`; an idle `ollama serve` daemon is acceptable. Stop a listed model with `ollama stop <model>` and verify `ollama ps` is empty before measuring. A loaded Ollama model has a large resident footprint that contaminates TF timing and memory results.
 
 Run package tests through `Scripts/test.sh`. Run only one app, CLI, or model-using test at a time.
 
