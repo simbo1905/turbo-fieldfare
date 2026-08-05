@@ -126,3 +126,12 @@ uv run --script summarisation/showboat/private_benchmark.py measure ollama 10
 ```output
 ollama chunk=10 context=4096 status=ok wall_seconds=63.130 peak_rss_mib=18514.0 memory_free_before=72 memory_free_after=9
 ```
+
+Item 26 executed exactly once via `uv run --script summarisation/showboat/private_benchmark.py measure ollama 11`. The private measurement record reports: ollama chunk=11 context=4096 status=ok wall_seconds=65.618 peak_rss_mib=18569.4 memory_free_before=72 memory_free_after=9. The original successful Showboat execution block was inadvertently popped while removing a failed validation entry; it is not rerun to preserve the single-run protocol.
+
+```bash
+ollama stop gemma4:26b
+```
+
+```output
+[?25l[?2026h[?25l[1G[K[?25h[?2026l[2K[1G[?25h```
