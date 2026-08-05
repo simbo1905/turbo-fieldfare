@@ -37,7 +37,7 @@ review08. [done] Record complete private measurement provenance and publish only
 18. [done] Ollama measured chunk 03.
 19. [x] Ollama measured chunk 04.
 20. [done] Ollama measured chunk 05.
-21. Ollama measured chunk 06.
+21. [done] Ollama measured chunk 06.
 22. Ollama measured chunk 07.
 23. Ollama measured chunk 08.
 24. Ollama measured chunk 09.
