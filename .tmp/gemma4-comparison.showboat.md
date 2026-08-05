@@ -118,3 +118,11 @@ task_root=$(jq -r .results_root .tmp/showboat-private-config.json); rg '^[[:spac
   "peak_rss_mib": 1584.671875,
   "wall_seconds": 73.5944699998945,
 ```
+
+```bash
+uv run --script summarisation/showboat/private_benchmark.py measure turbofieldfare 7
+```
+
+```output
+turbofieldfare chunk=07 context=4096 status=ok wall_seconds=75.639 peak_rss_mib=1587.5 memory_free_before=48 memory_free_after=43
+```
