@@ -40,3 +40,13 @@ uv run --script summarisation/showboat/private_benchmark.py measure turbofieldfa
 ```output
 turbofieldfare chunk=00 context=4096 status=ok wall_seconds=66.121 peak_rss_mib=1577.7 memory_free_before=54 memory_free_after=41
 ```
+
+```bash
+uv run --script summarisation/showboat/private_benchmark.py measure turbofieldfare 1 --context 4096
+```
+
+```output
+turbofieldfare chunk=01 context=4096 status=ok wall_seconds=73.654 peak_rss_mib=1563.2 memory_free_before=50 memory_free_after=40
+```
+
+Item 03: one measured TurboFieldfare run on anonymous chunk 01 at context 4096. The runner performs the complete AGENTS.md preflight immediately before this sole backend invocation and owns a finite timeout.
