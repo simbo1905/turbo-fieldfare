@@ -90,3 +90,31 @@ uv run --script summarisation/showboat/private_benchmark.py measure turbofieldfa
 ```output
 turbofieldfare chunk=05 context=4096 status=ok wall_seconds=71.497 peak_rss_mib=1578.4 memory_free_before=48 memory_free_after=41
 ```
+
+Item 08: one measured TurboFieldfare run on anonymous chunk 06 at context 4096. The runner repeats the complete AGENTS.md preflight immediately before this sole backend invocation, checks model ownership and resources, and owns a finite process-group timeout.
+
+```bash
+uv run --script summarisation/showboat/private_benchmark.py measure turbofieldfare 6 --context 4096
+```
+
+```output
+turbofieldfare chunk=06 context=4096 status=ok wall_seconds=73.594 peak_rss_mib=1584.7 memory_free_before=48 memory_free_after=43
+```
+
+Item 08 record: the sole TurboFieldfare invocation completed before the runner returned its measurement artifact. This public-safe verification reads only non-confidential measurement fields and does not start another model workload.
+
+```bash
+task_root=$(jq -r .results_root .tmp/showboat-private-config.json); rg '^[[:space:]]*"(backend|chunk|context|exit_code|wall_seconds|peak_rss_mib|memory_free_before_percent|memory_free_after_percent)":' "$task_root/measured/turbofieldfare/context-4096/chunk-06/measurement.json"
+```
+
+```output
+  "backend": "turbofieldfare",
+    "context": 4096,
+  "chunk": 6,
+  "context": 4096,
+  "exit_code": 0,
+  "memory_free_after_percent": 43,
+  "memory_free_before_percent": 48,
+  "peak_rss_mib": 1584.671875,
+  "wall_seconds": 73.5944699998945,
+```
