@@ -19,8 +19,11 @@ import urllib.request
 JUDGES = ("gpt-5.6-terra", "claude-sonnet-5", "kimi-k3")
 ZEN_BASE_URL = "https://opencode.ai/zen/v1"
 JUDGE_PROTOCOLS = {
-    "gpt-5.6-terra": ("responses", "/responses"),
-    "claude-sonnet-5": ("messages", "/messages"),
+    # Zen accepts the requested cross-provider model identifiers through its
+    # OpenAI-compatible chat endpoint. Keep the wire format identical so the
+    # blind-comparison request is the same task for every judge.
+    "gpt-5.6-terra": ("chat", "/chat/completions"),
+    "claude-sonnet-5": ("chat", "/chat/completions"),
     "kimi-k3": ("chat", "/chat/completions"),
 }
 
@@ -67,15 +70,8 @@ def request_judge(zen_base_url: str, model: str, source: str, a: str, b: str) ->
         "split hairs over style.\n\nSOURCE:\n" + source + "\n\nA:\n" + a + "\n\nB:\n" + b
     )
     protocol, suffix = JUDGE_PROTOCOLS[model]
-    if protocol == "responses":
-        payload = {"model": model, "input": prompt}
-    elif protocol == "messages":
-        payload = {"model": model, "max_tokens": 16, "messages": [{"role": "user", "content": prompt}]}
-    else:
-        payload = {"model": model, "messages": [{"role": "user", "content": prompt}]}
+    payload = {"model": model, "messages": [{"role": "user", "content": prompt}]}
     headers = {"Content-Type": "application/json"}
-    if protocol == "messages":
-        headers["anthropic-version"] = "2023-06-01"
     token = os.environ.get("OPENCODE_API_KEY") or os.environ.get("OPENAI_API_KEY")
     if not token:
         return None, None, "no API key is available", payload

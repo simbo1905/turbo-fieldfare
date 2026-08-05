@@ -24,10 +24,10 @@ class PairwiseCompareTests(unittest.TestCase):
                 size = int(self.headers["Content-Length"])
                 request = json.loads(self.rfile.read(size))
                 received.append((self.path, request, dict(self.headers)))
-                if self.path.endswith("/responses"):
-                    response = {"output_text": "A"}
-                elif self.path.endswith("/messages"):
-                    response = {"content": [{"type": "text", "text": "TIE"}]}
+                if request["model"] == "gpt-5.6-terra":
+                    response = {"choices": [{"message": {"content": "A"}}]}
+                elif request["model"] == "claude-sonnet-5":
+                    response = {"choices": [{"message": {"content": "TIE"}}]}
                 else:
                     response = {"choices": [{"message": {"content": "B"}}]}
                 body = json.dumps(response).encode()
@@ -58,11 +58,11 @@ class PairwiseCompareTests(unittest.TestCase):
             server.shutdown()
             thread.join()
             server.server_close()
-        self.assertEqual([path for path, _request, _headers in received], ["/v1/responses", "/v1/messages", "/v1/chat/completions"])
+        self.assertEqual([path for path, _request, _headers in received], ["/v1/chat/completions"] * 3)
         self.assertEqual([request["model"] for _path, request, _headers in received], ["gpt-5.6-terra", "claude-sonnet-5", "kimi-k3"])
         prompts = [request.get("input") or request["messages"][0]["content"] for _path, request, _headers in received]
         self.assertTrue(all("SOURCE FIXTURE" in prompt and "A FIXTURE" in prompt and "B FIXTURE" in prompt for prompt in prompts))
-        self.assertEqual(received[1][2]["Anthropic-Version"], "2023-06-01")
+        self.assertTrue(all("Anthropic-Version" not in headers for _path, _request, headers in received))
         self.assertEqual(result["aggregate"], {"score_a": 3, "score_b": 3, "verdict": "TIE"})
         self.assertNotIn("SOURCE FIXTURE", output_text)
 
