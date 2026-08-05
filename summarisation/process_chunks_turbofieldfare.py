@@ -32,6 +32,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--top-k", type=int)
     parser.add_argument("--top-p", type=float)
     parser.add_argument("--repetition-penalty", type=float)
+    parser.add_argument("--expert-cache-slots", type=int)
+    parser.add_argument("--expert-cache-policy")
+    parser.add_argument("--prefill", choices=["on", "off"])
+    parser.add_argument("--prefill-chunk-tokens", type=int)
+    parser.add_argument("--rdadvise")
     args = parser.parse_args(argv)
 
     source = args.input.read_text(encoding="utf-8")
@@ -52,6 +57,11 @@ def main(argv: list[str] | None = None) -> int:
             ("--top-k", args.top_k),
             ("--top-p", args.top_p),
             ("--repetition-penalty", args.repetition_penalty),
+            ("--expert-cache-slots", args.expert_cache_slots),
+            ("--expert-cache-policy", args.expert_cache_policy),
+            ("--prefill", args.prefill),
+            ("--prefill-chunk-tokens", args.prefill_chunk_tokens),
+            ("--rdadvise", args.rdadvise),
         ]:
             if value is not None:
                 command.extend([flag, str(value)])

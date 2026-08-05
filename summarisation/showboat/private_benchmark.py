@@ -334,12 +334,14 @@ def run_one(config: dict, root: Path, backend: str, chunk: int | None, context: 
         raise ValueError("a chunk or --largest is required")
     if not 0 <= chunk < len(manifest["chunks"]):
         raise ValueError("invalid chunk index")
-    if series not in {"primary", "sweep"}:
+    if series not in {"primary", "sweep", "knobs"}:
         raise ValueError("unsupported result series")
-    # Primary results retain their original layout. Sweep artifacts are kept
-    # wholly separate so a discarded 4K warmup can never collide with its
-    # primary counterpart or a later measured variation.
-    series_root = root if series == "primary" else root / "sweep"
+    if series == "primary":
+        series_root = root
+    elif series == "sweep":
+        series_root = root / "sweep"
+    else:
+        series_root = root / "knobs"
     run_root = series_root / ("warmup" if warmup else "measured") / backend / f"context-{context}" / f"chunk-{chunk:02d}"
     if run_root.exists():
         raise RuntimeError("result already exists")
@@ -453,7 +455,7 @@ def main(argv: list[str] | None = None) -> int:
         action.add_argument("chunk", type=int, nargs="?")
         action.add_argument("--largest", action="store_true", help="select the largest manifest chunk; only its anonymous index is reported")
         action.add_argument("--context", type=int, default=4096)
-        action.add_argument("--series", choices=["primary", "sweep"], default="primary", help="write sweep artifacts beneath a separate private directory")
+        action.add_argument("--series", choices=["primary", "sweep", "knobs"], default="primary", help="write artifacts beneath a separate private directory")
     public = sub.add_parser("public-report")
     public.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
