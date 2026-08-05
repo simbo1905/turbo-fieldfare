@@ -42,3 +42,19 @@ uv run --script summarisation/showboat/private_benchmark.py measure ollama 1
 ```output
 ollama chunk=01 context=4096 status=ok wall_seconds=57.924 peak_rss_mib=18559.1 memory_free_before=77 memory_free_after=9
 ```
+
+```bash
+uv run --script summarisation/showboat/private_benchmark.py measure ollama 2
+```
+
+```output
+ollama chunk=02 context=4096 status=ok wall_seconds=73.082 peak_rss_mib=18549.4 memory_free_before=77 memory_free_after=9
+```
+
+```bash
+measurement=$(find .tmp -type f -path "*/measured/ollama/context-4096/chunk-02/measurement.json" -print -quit); test -n "$measurement"; jq -er "if (.backend == \"ollama\" and .chunk == 2 and .context == 4096 and (.exit_code | type) == \"number\" and (.wall_seconds | type) == \"number\" and (.peak_rss_mib | type) == \"number\" and (.memory_free_before_percent | type) == \"number\" and (.memory_free_after_percent | type) == \"number\") then \"ollama chunk=02 context=\\(.context) exit=\\(.exit_code) wall_seconds=\\(.wall_seconds|floor) peak_rss_mib=\\(.peak_rss_mib|floor) memory_free_before=\\(.memory_free_before_percent) memory_free_after=\\(.memory_free_after_percent)\" else error(\"aggregate measurement validation failed\") end" "$measurement"
+```
+
+```output
+ollama chunk=02 context=4096 exit=0 wall_seconds=73 peak_rss_mib=18549 memory_free_before=77 memory_free_after=9
+```
