@@ -46,7 +46,7 @@ review08. [done] Record complete private measurement provenance and publish only
 27w. [done] Discarded TurboFieldfare context-sweep warmup on the largest private chunk at 4096.
 27. [done] Largest private chunk, TurboFieldfare context 4096.
 28. [done] Largest private chunk, TurboFieldfare context 8192.
-29. Largest private chunk, TurboFieldfare context 16384.
+29. [done] Largest private chunk, TurboFieldfare context 16384.
 30. Largest private chunk, TurboFieldfare context 32768.
 31. Largest private chunk, TurboFieldfare context 65536.
 32. Prepare local blinded pairs: 4K baseline versus each context candidate.

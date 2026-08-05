@@ -59,3 +59,13 @@ uv run --script summarisation/showboat/private_benchmark.py measure turbofieldfa
 ```output
 turbofieldfare chunk=06 context=8192 status=ok wall_seconds=58.032 peak_rss_mib=1667.0 memory_free_before=68 memory_free_after=66
 ```
+
+Item 29 reconciliation: the private sweep artifact already contains one valid completed TurboFieldfare measurement for anonymous largest chunk 06 at context 16384. No duplicate model invocation is permitted. The following command prints only an allowlisted aggregate; it excludes paths, source material, summaries, argv, logs, hashes, and private provenance.
+
+```bash
+./.tmp/item29_record.py
+```
+
+```output
+{"backend": "turbofieldfare", "chunk": 6, "context": 16384, "exit_code": 0, "memory_free_after_percent": 62, "memory_free_before_percent": 68, "output_bytes": 3243, "peak_rss_mib": 1648.359375, "runner_error": null, "series": "sweep", "wall_seconds": 59.47545083286241, "warmup": false}
+```
