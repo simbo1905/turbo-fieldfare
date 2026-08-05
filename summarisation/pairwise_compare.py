@@ -17,6 +17,12 @@ import urllib.request
 
 
 JUDGES = ("gpt-5.6-terra", "claude-sonnet-5", "kimi-k3")
+ZEN_BASE_URL = "https://opencode.ai/zen/v1"
+JUDGE_PROTOCOLS = {
+    "gpt-5.6-terra": ("responses", "/responses"),
+    "claude-sonnet-5": ("messages", "/messages"),
+    "kimi-k3": ("chat", "/chat/completions"),
+}
 
 
 def load_dotenv() -> None:
@@ -44,27 +50,48 @@ def verdict(text: str) -> str | None:
     return None
 
 
-def request_judge(endpoint: str, model: str, source: str, a: str, b: str) -> tuple[str | None, str | None, str | None, dict]:
+def response_text(protocol: str, parsed: dict) -> str:
+    if protocol == "responses":
+        if isinstance(parsed.get("output_text"), str):
+            return parsed["output_text"]
+        return str(parsed["output"][0]["content"][0]["text"])
+    if protocol == "messages":
+        return str(parsed["content"][0]["text"])
+    return str(parsed["choices"][0]["message"]["content"])
+
+
+def request_judge(zen_base_url: str, model: str, source: str, a: str, b: str) -> tuple[str | None, str | None, str | None, dict]:
     prompt = (
         "Assess faithfulness and usefulness against the source. Choose the materially "
         "better summary. Reply exactly A, B, or TIE. TIE means no material loss; do not "
         "split hairs over style.\n\nSOURCE:\n" + source + "\n\nA:\n" + a + "\n\nB:\n" + b
     )
-    payload = {"model": model, "messages": [{"role": "user", "content": prompt}]}
+    protocol, suffix = JUDGE_PROTOCOLS[model]
+    if protocol == "responses":
+        payload = {"model": model, "input": prompt}
+    elif protocol == "messages":
+        payload = {"model": model, "max_tokens": 16, "messages": [{"role": "user", "content": prompt}]}
+    else:
+        payload = {"model": model, "messages": [{"role": "user", "content": prompt}]}
     headers = {"Content-Type": "application/json"}
+    if protocol == "messages":
+        headers["anthropic-version"] = "2023-06-01"
     token = os.environ.get("OPENCODE_API_KEY") or os.environ.get("OPENAI_API_KEY")
     if not token:
         return None, None, "no API key is available", payload
     headers["Authorization"] = "Bearer " + token
     try:
         encoded = json.dumps(payload).encode("utf-8")
+        endpoint = zen_base_url.rstrip("/") + suffix
         request = urllib.request.Request(endpoint, data=encoded, headers=headers, method="POST")
         with urllib.request.urlopen(request, timeout=120) as response:
             raw = response.read().decode("utf-8")
         parsed = json.loads(raw)
-        choice = verdict(str(parsed["choices"][0]["message"]["content"]))
+        choice = verdict(response_text(protocol, parsed))
         return choice, raw, None if choice else "invalid verdict", payload
-    except (urllib.error.URLError, urllib.error.HTTPError, OSError, ValueError, KeyError, IndexError) as error:
+    except urllib.error.HTTPError as error:
+        return None, None, f"judge request failed (HTTP {error.code})", payload
+    except (urllib.error.URLError, OSError, ValueError, KeyError, IndexError):
         return None, None, "judge request failed", payload
 
 
@@ -85,7 +112,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--summary-a", type=Path, required=True)
     parser.add_argument("--summary-b", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--endpoint", required=True, help="explicit OpenAI-compatible gateway serving all three judge models")
+    parser.add_argument("--zen-base-url", default=ZEN_BASE_URL, help="OpenCode Zen API base URL; provider paths are fixed by model")
     parser.add_argument("--private-log", type=Path, help="optional .tmp-only JSONL raw request/response audit")
     args = parser.parse_args(argv)
     load_dotenv()
@@ -99,7 +126,7 @@ def main(argv: list[str] | None = None) -> int:
     rows: list[dict] = []
     score_a = score_b = 0
     for model in JUDGES:
-        choice, raw, error, payload = request_judge(args.endpoint, model, source, summary_a, summary_b)
+        choice, raw, error, payload = request_judge(args.zen_base_url, model, source, summary_a, summary_b)
         if choice == "A":
             points_a, points_b = 2, 0
         elif choice == "B":

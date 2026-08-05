@@ -50,7 +50,7 @@ review08. [done] Record complete private measurement provenance and publish only
 30. [done] Largest private chunk, TurboFieldfare context 32768.
 31. [done] Largest private chunk, TurboFieldfare context 65536.
 32. [done] Prepare the ten private context-pairwise choices and the one-shot three-judge spot-check command.
-33. Record authorized local blind-pair ratings and aggregate wins/ties.
+33. [blocked] The authorized 4K-vs-64K three-judge spot check reached the documented Zen endpoints, but all three returned HTTP 403 before any verdict; no aggregate is claimed.
 34. Produce public report, privacy audit, append final notebook, stage, publish,
     and revision-verify the sanitized Gist.
 
