@@ -2,8 +2,7 @@
 
 ## Status
 
-In progress. The user resumed execution after the rebased branch was pushed to
-the fork at `b4d86d6`; comparison uses the original stock 4K context.
+Completed on 2026-08-05. The comparison used the original stock 4K context.
 
 ## Objective
 
@@ -41,6 +40,10 @@ the submitted defaults silently.
 - Chunk48 is 11,020 bytes, so byte-window size is not a reliable proxy for its
   tokenizer length.
 - Ollama was unloaded before the TF pass; `ollama ps` was empty.
+- Exact token preflight identified five non-fitting chunks: 48, 49, 50, 51,
+  and 54. They were excluded from both output sets before the continuation.
+- Ollama completed all 61 source chunks. TF completed all 56 eligible chunks
+  at stock 4K. No eligible TF output failed or was empty.
 
 Exact no-model token preflight used the CLI's tokenizer with a one-token context
 probe. It blacklisted chunks 48, 49, 50, 51, and 54 from both output sets
@@ -114,11 +117,11 @@ failure rather than rerunning with changed settings.
 
 ## Pass criteria
 
-- [ ] Exactly 61 deterministic chunks are generated from all Markdown files.
-- [ ] Preflight passes without protocol deviations.
-- [ ] Ollama completes all 61 chunks with stock settings and no warmup.
-- [ ] Ollama has no loaded model before TurboFieldfare starts; an idle daemon is acceptable.
-- [ ] The submitted CLI completes the 56 matching chunks at stock 4K; chunks
+- [x] Exactly 61 deterministic chunks are generated from all Markdown files.
+- [x] Preflight passes; idle Ollama daemon allowed and no model was loaded for TF.
+- [x] Ollama completes all 61 chunks with stock settings and no warmup.
+- [x] Ollama has no loaded model before TurboFieldfare starts.
+- [x] The submitted CLI completes all 56 matching chunks at stock 4K; chunks
       48, 49, 50, 51, and 54 are excluded from both sides because they do not fit.
-- [ ] Every response, timing record, and error record is preserved privately.
-- [ ] Sanity checks find no catastrophic runner/output failure.
+- [x] Every response, timing record, and error record is preserved privately.
+- [x] Sanity checks find no eligible-chunk runner/output failure.

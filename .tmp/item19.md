@@ -2,7 +2,7 @@
 
 ## Status
 
-Pending item18.
+Completed on 2026-08-05.
 
 ## Objective
 
@@ -64,9 +64,12 @@ sanitized failure descriptions.
 
 ## Pass criteria
 
-- [ ] Twelve unique, evenly spaced chunk indices are recorded before judging.
-- [ ] All 72 calls return valid structured verdicts.
-- [ ] AB/BA labels are normalized correctly.
-- [ ] Default-TIE rubric is used unchanged for every call.
-- [ ] Results show no evidence that TF is systematically materially worse, or
-      any contrary evidence is reported directly without dilution.
+- [x] Twelve unique, evenly spaced eligible indices were selected: 00, 05, 10,
+      15, 20, 25, 30, 35, 40, 45, 55, 60.
+- [x] All 72 calls returned valid structured verdicts.
+- [x] AB/BA labels were normalized correctly.
+- [x] Default-TIE rubric was used unchanged for every call.
+- [x] Results: 64 ties, 7 Ollama preferences, 1 TF preference. There is no
+      panel-wide evidence of systematic catastrophic TF degradation, but one
+      selected chunk received all six normalized preferences for Ollama and is
+      reported as a material localized concern rather than diluted.

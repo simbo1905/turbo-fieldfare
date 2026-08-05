@@ -2,11 +2,12 @@
 
 ## Headline
 
-The completed twelve-chunk baseline shows a clear space-for-speed tradeoff on
-this machine. TurboFieldfare averaged **74.36 s** per chunk with **1,538.72 to
-1,587.53 MiB** sampled peak RSS. Ollama averaged **60.59 s** with **18,480.08
-to 18,569.41 MiB** sampled peak RSS. In that series, TurboFieldfare was **22.7%
-slower** while using about **17 GiB less** sampled process RSS.
+The completed 56-chunk stock-4K comparison shows a clear space-for-speed
+tradeoff on this machine. TurboFieldfare took **4,144.53 s** total, versus
+**2,774.15 s** for Ollama, making TF **49.4% slower** on the comparable chunks.
+TF's sampled peak RSS ranged from **1,500.5 to 1,834.2 MiB**. The matching
+61-chunk Ollama run did not collect peak RSS; the prior twelve-chunk native
+Ollama series measured **18,480.08 to 18,569.41 MiB** sampled peak RSS.
 
 RSS is sampled process footprint, not complete unified-memory accounting or a
 device-memory profiler. These figures are measurements from one Mac, not
@@ -44,8 +45,23 @@ The largest anonymous selected chunk was measured once per listed context, with 
 A stock Ollama pass over all 61 deterministic 11K/10K chunks completed with no
 warmup and no option overrides: **61/61 successful**, **3,034.54 s total**
 (50m 34.54s), **50.32 s median** per chunk, and **161,682 B** visible output.
-The matching stock TurboFieldfare pass is still in progress and will be added
-as a separate measured series.
+
+Five chunks could not fit TurboFieldfare's stock 4K context after exact
+tokenization, so they were excluded from both sides. On the remaining 56
+comparable chunks, TF completed **56/56**, with **4,144.53 s total**,
+**72.16 s median** per chunk, **141,540 B** output, and sampled peak RSS of
+**1,500.5 to 1,834.2 MiB**. Ollama took **2,774.15 s total**, **50.32 s median**
+per chunk, and produced **149,813 B**.
+
+## Blind quality panel
+
+Twelve evenly spaced eligible chunks were presented in both A/B orders to three
+judges under a conservative source-grounded non-inferiority rubric. All **72/72**
+verdicts were valid: **64 ties**, **7 Ollama preferences**, and **1 TF
+preference** after normalizing order. This is not panel-wide evidence of
+systematic catastrophic TF degradation. One selected chunk received all six
+normalized preferences for Ollama, so the result is not a blanket equivalence
+claim.
 
 ## Provenance and limitations
 

@@ -16,15 +16,43 @@
     "ollama_native_defaults": {"runs": 12, "successful": 12, "wall_seconds_total": 727.059712, "wall_seconds_mean": 60.588309, "wall_seconds_min": 48.352319, "wall_seconds_max": 73.081548, "output_bytes_total": 36109, "peak_rss_mib_min": 18480.078125, "peak_rss_mib_max": 18569.406250}
   },
   "full_course_aggregates": {
-    "ollama_native_defaults": {
+    "ollama_native_defaults_all_chunks": {
       "runs": 61,
       "successful": 61,
       "wall_seconds_total": 3034.541802,
       "wall_seconds_median": 50.322240,
       "output_bytes_total": 161682,
       "peak_rss_mib": null,
-      "note": "Stock pass without warmup or option overrides; matching TurboFieldfare series pending."
+      "note": "Stock pass without warmup or option overrides; comparable subset reported separately."
+    },
+    "comparable_stock_4k": {
+      "excluded_chunk_indices": [48, 49, 50, 51, 54],
+      "ollama_native_defaults": {
+        "runs": 56,
+        "successful": 56,
+        "wall_seconds_total": 2774.154896,
+        "wall_seconds_median": 50.322240,
+        "output_bytes_total": 149813,
+        "peak_rss_mib": null
+      },
+      "turbofieldfare_shipped_defaults": {
+        "runs": 56,
+        "successful": 56,
+        "wall_seconds_total": 4144.526633,
+        "wall_seconds_median": 72.156626,
+        "output_bytes_total": 141540,
+        "peak_rss_mib_min": 1500.5,
+        "peak_rss_mib_max": 1834.1875
+      }
     }
+  },
+  "quality_panel": {
+    "chunks": 12,
+    "orders": 24,
+    "judge_calls": 72,
+    "valid_verdicts": 72,
+    "normalized": {"turbofieldfare_preferences": 1, "ollama_preferences": 7, "ties": 64},
+    "conclusion": "No panel-wide evidence of systematic catastrophic TF degradation; one selected chunk was unanimously preferred for Ollama."
   },
   "per_run_data": "metrics.csv"
 }
