@@ -60,6 +60,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--model", required=True, type=Path)
     parser.add_argument("--max-context", type=int, default=4096)
     parser.add_argument("--start-index", type=int, default=0)
+    parser.add_argument("--include-index", action="append", type=int)
     parser.add_argument("--timeout", type=float, default=1800)
     args = parser.parse_args(argv)
 
@@ -70,10 +71,13 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--max-context must be positive")
     if not 0 <= args.start_index < len(chunks):
         parser.error("--start-index must select an input chunk")
+    included = set(args.include_index or range(args.start_index, len(chunks)))
+    if not included or not all(0 <= index < len(chunks) for index in included):
+        parser.error("--include-index must select input chunks")
     args.output.mkdir(parents=True, exist_ok=True)
     records = []
     for index, chunk in enumerate(chunks):
-        if index < args.start_index:
+        if index not in included:
             continue
         output_dir = args.output / f"chunk{index:02d}"
         if output_dir.exists():
@@ -135,6 +139,7 @@ def main(argv: list[str] | None = None) -> int:
             "shipped_generation_defaults": True,
             "shipped_runtime_defaults": True,
             "start_index": args.start_index,
+            "included_indices": sorted(included),
         }, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )

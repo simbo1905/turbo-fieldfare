@@ -13,8 +13,8 @@ inferior on the supplied source.
 
 ## Sample
 
-- Exclude `chunk48`, which does not fit stock 4K TurboFieldfare, from both
-  backend sets before selection.
+- Exclude chunks 48, 49, 50, 51, and 54, which do not fit stock 4K
+  TurboFieldfare, from both backend sets before selection.
 - Select exactly 12 chunks evenly across the remaining ordered comparable
   indices.
 - Compute and record the selection algorithm before judging.

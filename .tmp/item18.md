@@ -42,12 +42,13 @@ the submitted defaults silently.
   tokenizer length.
 - Ollama was unloaded before the TF pass; `ollama ps` was empty.
 
-`chunk48` is blacklisted from both backend output sets because its 4,673-token
-prompt cannot fit the stock 4K TF context. A 16K retry was started only to
-confirm the setting works, then aborted after its first output; it is not part
-of the comparison. Resume chunks 49–60 at the original 4K setting. Keep
-temperature, Top-K, Top-P, repetition penalty, max-new, and all five runtime
-controls at shipped defaults.
+Exact no-model token preflight used the CLI's tokenizer with a one-token context
+probe. It blacklisted chunks 48, 49, 50, 51, and 54 from both output sets
+because their prompts are at least 4,096 tokens. A 16K retry was started only
+to confirm the setting works, then aborted after its first output; it is not
+part of the comparison. Resume only eligible chunks at the original 4K setting.
+Keep temperature, Top-K, Top-P, repetition penalty, max-new, and all five
+runtime controls at shipped defaults.
 
 ## Required machine preflight
 
@@ -117,7 +118,7 @@ failure rather than rerunning with changed settings.
 - [ ] Preflight passes without protocol deviations.
 - [ ] Ollama completes all 61 chunks with stock settings and no warmup.
 - [ ] Ollama has no loaded model before TurboFieldfare starts; an idle daemon is acceptable.
-- [ ] The submitted CLI completes the 60 matching chunks at stock 4K; chunk48
-      is excluded from both sides because it does not fit.
+- [ ] The submitted CLI completes the 56 matching chunks at stock 4K; chunks
+      48, 49, 50, 51, and 54 are excluded from both sides because they do not fit.
 - [ ] Every response, timing record, and error record is preserved privately.
 - [ ] Sanity checks find no catastrophic runner/output failure.
