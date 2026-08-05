@@ -160,11 +160,3 @@ uv run --script summarisation/showboat/private_benchmark.py measure turbofieldfa
 ```output
 turbofieldfare chunk=11 context=4096 status=ok wall_seconds=80.644 peak_rss_mib=1570.0 memory_free_before=46 memory_free_after=41
 ```
-
-```bash
-uv run --script summarisation/showboat/private_benchmark.py measure ollama 8
-```
-
-```output
-ollama chunk=08 context=4096 status=ok wall_seconds=59.244 peak_rss_mib=18480.1 memory_free_before=72 memory_free_after=70
-```
