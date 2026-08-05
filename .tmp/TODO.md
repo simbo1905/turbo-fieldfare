@@ -41,7 +41,7 @@ review08. [done] Record complete private measurement provenance and publish only
 22. [done] Ollama measured chunk 07.
 23. [done] Ollama measured chunk 08.
 24. [done] Ollama measured chunk 09.
-25. Ollama measured chunk 10.
+25. [done] Ollama measured chunk 10.
 26. Ollama measured chunk 11.
 27. Largest private chunk, TurboFieldfare context 4096.
 28. Largest private chunk, TurboFieldfare context 8192.
