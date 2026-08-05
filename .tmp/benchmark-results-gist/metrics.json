@@ -1,0 +1,20 @@
+{
+  "format": "turbofieldfare-local-summarisation-aggregate-v1",
+  "privacy": {
+    "included": ["anonymous chunk identifiers", "aggregate measurements", "per-run source commit provenance"],
+    "excluded": ["source text", "source names", "prompts", "summaries", "filesystem paths", "raw logs", "API keys", "output hashes"]
+  },
+  "environment": {
+    "hardware": "Mac17,2",
+    "architecture": "arm64",
+    "ram_gib": 32,
+    "macos": "26.5.2",
+    "swift": "6.2.1"
+  },
+  "baseline_aggregates": {
+    "turbofieldfare_4k": {"runs": 12, "successful": 12, "wall_seconds_total": 892.273260, "wall_seconds_mean": 74.356105, "wall_seconds_min": 66.120812, "wall_seconds_max": 80.643890, "output_bytes_total": 36565, "peak_rss_mib_min": 1538.718750, "peak_rss_mib_max": 1587.531250},
+    "ollama_native_defaults": {"runs": 12, "successful": 12, "wall_seconds_total": 727.059712, "wall_seconds_mean": 60.588309, "wall_seconds_min": 48.352319, "wall_seconds_max": 73.081548, "output_bytes_total": 36109, "peak_rss_mib_min": 18480.078125, "peak_rss_mib_max": 18569.406250}
+  },
+  "quality_spot_check": {"attempts": 6, "valid_verdicts": 0, "failure": "HTTP 403 before verdict", "score_claim": "none"},
+  "per_run_data": "metrics.csv"
+}
