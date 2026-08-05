@@ -16,7 +16,7 @@ import urllib.error
 import urllib.request
 
 
-JUDGES = ("gpt-5.6-terra", "claude-sonnet-5", "kimi-k3")
+JUDGES = ("gpt-5.6-terra", "claude-sonnet-5", "deepseek-v4-pro")
 ZEN_BASE_URL = "https://opencode.ai/zen/v1"
 JUDGE_PROTOCOLS = {
     # Zen accepts the requested cross-provider model identifiers through its
@@ -24,7 +24,7 @@ JUDGE_PROTOCOLS = {
     # blind-comparison request is the same task for every judge.
     "gpt-5.6-terra": ("chat", "/chat/completions"),
     "claude-sonnet-5": ("chat", "/chat/completions"),
-    "kimi-k3": ("chat", "/chat/completions"),
+    "deepseek-v4-pro": ("chat", "/chat/completions"),
 }
 
 
@@ -65,9 +65,25 @@ def response_text(protocol: str, parsed: dict) -> str:
 
 def request_judge(zen_base_url: str, model: str, source: str, a: str, b: str) -> tuple[str | None, str | None, str | None, dict]:
     prompt = (
-        "Assess faithfulness and usefulness against the source. Choose the materially "
-        "better summary. Reply exactly A, B, or TIE. TIE means no material loss; do not "
-        "split hairs over style.\n\nSOURCE:\n" + source + "\n\nA:\n" + a + "\n\nB:\n" + b
+        "Act as a conservative, source-grounded evaluator performing a non-inferiority test "
+        "between two summaries of learning material. The null hypothesis is that the summaries "
+        "are equivalent for practical use. Default to TIE unless the source provides clear "
+        "evidence that one summary is materially degraded. This is not a preference-ranking "
+        "task and you must not select a marginal winner.\n\n"
+        "Treat length, verbosity, formatting, section structure, rhetorical polish, and prose "
+        "style as nuisance variables. Do not reward a longer answer: higher inference or reasoning "
+        "budgets often add prose without adding information and can regress toward generic text. "
+        "Compare only source-grounded factual accuracy, coverage of decision-relevant concepts, "
+        "precision, and clarity.\n\n"
+        "Choose A or B only when the other candidate has a deployment-relevant material defect, "
+        "such as: an unsupported factual claim or hallucination; an inference or editorial "
+        "interpretation promoted to an explicitly stated source fact; a material distortion, "
+        "overstatement, or loss of precision; or omission of a substantive concept that a "
+        "reasonable business-English executive summary should retain. A summary need not repeat "
+        "every detail. Minor omissions, formatting artifacts, stylistic differences, balanced "
+        "trade-offs, and ambiguous advantages require TIE.\n\n"
+        "Evaluate silently. Reply with exactly one token: A, B, or TIE.\n\nSOURCE:\n"
+        + source + "\n\nA:\n" + a + "\n\nB:\n" + b
     )
     protocol, suffix = JUDGE_PROTOCOLS[model]
     payload = {"model": model, "messages": [{"role": "user", "content": prompt}]}
