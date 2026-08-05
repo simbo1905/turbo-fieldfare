@@ -58,25 +58,36 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--cli", required=True, type=Path)
     parser.add_argument("--model", required=True, type=Path)
+    parser.add_argument("--max-context", type=int, default=4096)
+    parser.add_argument("--start-index", type=int, default=0)
     parser.add_argument("--timeout", type=float, default=1800)
     args = parser.parse_args(argv)
 
     chunks = sorted(args.input.glob("chunk*.md"))
     if not chunks:
         parser.error("input contains no chunk files")
-    if args.output.exists():
-        parser.error("output already exists")
-    args.output.mkdir(parents=True)
+    if args.max_context <= 0:
+        parser.error("--max-context must be positive")
+    if not 0 <= args.start_index < len(chunks):
+        parser.error("--start-index must select an input chunk")
+    args.output.mkdir(parents=True, exist_ok=True)
     records = []
     for index, chunk in enumerate(chunks):
+        if index < args.start_index:
+            continue
         output_dir = args.output / f"chunk{index:02d}"
+        if output_dir.exists():
+            parser.error(f"output already exists for chunk {index:02d}")
         output_dir.mkdir()
         source = chunk.read_text(encoding="utf-8")
         messages = [{"role": "user", "content": PROMPT + "\n\n" + source}]
         with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", suffix=".json") as message_file:
             json.dump(messages, message_file)
             message_file.flush()
-            command = [str(args.cli), "--model", str(args.model), "--messages-file", message_file.name]
+            command = [
+                str(args.cli), "--model", str(args.model), "--messages-file", message_file.name,
+                "--max-context", str(args.max_context),
+            ]
             started_at = utc_now()
             started = time.monotonic()
             with (output_dir / "response.md").open("wb") as stdout, (output_dir / "stderr.txt").open("wb") as stderr:
@@ -118,10 +129,16 @@ def main(argv: list[str] | None = None) -> int:
         if exit_code != 0:
             break
     (args.output / "manifest.json").write_text(
-        json.dumps({"stock_options": True, "records": records}, indent=2, sort_keys=True) + "\n",
+        json.dumps({
+            "max_context": args.max_context,
+            "records": records,
+            "shipped_generation_defaults": True,
+            "shipped_runtime_defaults": True,
+            "start_index": args.start_index,
+        }, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
-    return 0 if len(records) == len(chunks) and all(row["exit_code"] == 0 for row in records) else 1
+    return 0 if records and all(row["exit_code"] == 0 for row in records) else 1
 
 
 if __name__ == "__main__":
