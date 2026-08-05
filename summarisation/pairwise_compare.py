@@ -71,7 +71,12 @@ def request_judge(zen_base_url: str, model: str, source: str, a: str, b: str) ->
     )
     protocol, suffix = JUDGE_PROTOCOLS[model]
     payload = {"model": model, "messages": [{"role": "user", "content": prompt}]}
-    headers = {"Content-Type": "application/json"}
+    headers = {
+        "Content-Type": "application/json",
+        # urllib's default Python signature is rejected by Zen's Cloudflare
+        # browser-integrity rule (error 1010), before Zen sees the API key.
+        "User-Agent": "TurboFieldfare-Summarisation-Benchmark/1.0",
+    }
     token = os.environ.get("OPENCODE_API_KEY") or os.environ.get("OPENAI_API_KEY")
     if not token:
         return None, None, "no API key is available", payload
@@ -86,7 +91,10 @@ def request_judge(zen_base_url: str, model: str, source: str, a: str, b: str) ->
         choice = verdict(response_text(protocol, parsed))
         return choice, raw, None if choice else "invalid verdict", payload
     except urllib.error.HTTPError as error:
-        return None, None, f"judge request failed (HTTP {error.code})", payload
+        # HTTPError is also a readable response object. Preserve its body only
+        # in the caller's .tmp-restricted audit; keep public errors sanitized.
+        raw = error.read().decode("utf-8", errors="replace")
+        return None, raw, f"judge request failed (HTTP {error.code})", payload
     except (urllib.error.URLError, OSError, ValueError, KeyError, IndexError):
         return None, None, "judge request failed", payload
 
