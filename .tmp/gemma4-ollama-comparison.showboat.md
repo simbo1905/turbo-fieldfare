@@ -74,3 +74,11 @@ uv run --script summarisation/showboat/private_benchmark.py measure ollama 4
 ```output
 ollama chunk=04 context=4096 status=ok wall_seconds=66.068 peak_rss_mib=18556.0 memory_free_before=75 memory_free_after=8
 ```
+
+```bash
+uv run --script summarisation/showboat/private_benchmark.py measure ollama 5
+```
+
+```output
+ollama chunk=05 context=4096 status=ok wall_seconds=54.926 peak_rss_mib=18555.1 memory_free_before=72 memory_free_after=10
+```
