@@ -106,3 +106,15 @@ uv run --script summarisation/showboat/private_benchmark.py measure ollama 8
 ```output
 ollama chunk=08 context=4096 status=ok wall_seconds=59.244 peak_rss_mib=18480.1 memory_free_before=72 memory_free_after=70
 ```
+
+Item 24 completed outside Showboat to avoid a second model invocation.
+
+```bash
+uv run --script summarisation/showboat/private_benchmark.py measure ollama 9
+```
+
+```output
+ollama chunk=09 context=4096 status=ok wall_seconds=55.404 peak_rss_mib=18557.1 memory_free_before=72 memory_free_after=9
+```
+
+The benchmark-owned `gemma4:26b` instance was then stopped; `ollama ps` was clear.
