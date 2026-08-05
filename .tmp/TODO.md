@@ -21,7 +21,7 @@ review08. [done] Record complete private measurement provenance and publish only
 02. [done] TurboFieldfare measured chunk 00.
 03. [done] TurboFieldfare measured chunk 01.
 04. [done] TurboFieldfare measured chunk 02.
-05. TurboFieldfare measured chunk 03.
+05. [done] TurboFieldfare measured chunk 03.
 06. TurboFieldfare measured chunk 04.
 07. TurboFieldfare measured chunk 05.
 08. TurboFieldfare measured chunk 06.
