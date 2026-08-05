@@ -59,7 +59,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--candidate-a", required=True, type=Path)
     parser.add_argument("--candidate-b", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
-    parser.add_argument("--endpoint", default="https://api.openai.com/v1/chat/completions")
+    parser.add_argument(
+        "--endpoint",
+        required=True,
+        help="OpenAI-compatible gateway that can serve every requested judge model",
+    )
     parser.add_argument("--judge-model", action="append", required=True)
     args = parser.parse_args(argv)
     load_dotenv()

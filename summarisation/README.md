@@ -83,14 +83,18 @@ uv run --script summarisation/pairwise_grade.py \
   --candidate-a "$BENCH_ROOT/turbofieldfare/outputs" \
   --candidate-b "$BENCH_ROOT/ollama/outputs" \
   --output "$BENCH_ROOT/votes" \
+  --endpoint "$OPENCODE_COMPATIBLE_GATEWAY/v1/chat/completions" \
   --judge-model gpt-5.6-terra \
   --judge-model claude-sonnet-5 \
   --judge-model kimi-k3
 ```
 
-That plans 72 requests (12 chunks × 2 orders × 3 judges); it must be run only
-with deliberate authority for those requests. No verdict has been produced by
-this repository.
+`--endpoint` is mandatory and must name an OpenAI-compatible gateway capable
+of serving all three requested model identifiers; there is deliberately no
+OpenAI API default because that endpoint cannot serve the Claude and Kimi
+identifiers. This plans 72 requests (12 chunks × 2 orders × 3 judges); it must
+be run only with deliberate authority for those requests. No verdict has been
+produced by this repository.
 
 ## Files
 

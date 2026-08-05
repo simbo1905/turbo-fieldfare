@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -80,7 +81,7 @@ class BenchmarkToolsTests(unittest.TestCase):
     def tearDown(self):
         self.tempdir.cleanup()
 
-    def command(self, script: Path, *args: str, check: bool = True):
+    def command(self, script: Path, *args: str, check: bool = True, env=None):
         return subprocess.run(
             [sys.executable, str(script), *map(str, args)],
             cwd=ROOT,
@@ -88,6 +89,7 @@ class BenchmarkToolsTests(unittest.TestCase):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             check=check,
+            env=env,
         )
 
     def make_course(self) -> Path:
@@ -251,8 +253,19 @@ class BenchmarkToolsTests(unittest.TestCase):
                 "--output", output,
                 "--base-url", server.url,
                 "--model", "gemma4:26b",
+                "--prompt", "Summarise faithfully.",
             )
             self.assertEqual(len(server.requests), 2)
+            self.assertEqual(
+                [request["prompt"] for request in server.requests],
+                [
+                    "Summarise faithfully.\n\nfirst source",
+                    "Summarise faithfully.\n\nsecond source",
+                ],
+            )
+            self.assertTrue(
+                all(set(request) == {"model", "prompt", "stream"} for request in server.requests)
+            )
         self.assertEqual((output / "benchmark00.md").read_text(), "brief summary")
         self.assertEqual((output / "benchmark01.md").read_text(), "brief summary")
 
@@ -294,13 +307,18 @@ class BenchmarkToolsTests(unittest.TestCase):
                 "--output", output,
                 "--base-url", server.url,
                 "--model", "gemma4:26b",
+                "--prompt", "Summarise faithfully.",
                 check=False,
             )
             self.assertEqual(completed.returncode, 0, completed.stderr)
             self.assertEqual(len(server.requests), 1)
             self.assertEqual(
                 server.requests[0],
-                {"model": "gemma4:26b", "prompt": "single benchmark source", "stream": True},
+                {
+                    "model": "gemma4:26b",
+                    "prompt": "Summarise faithfully.\n\nsingle benchmark source",
+                    "stream": True,
+                },
             )
         self.assertEqual(output.read_text(encoding="utf-8"), "one summary")
 
@@ -374,6 +392,7 @@ class BenchmarkToolsTests(unittest.TestCase):
                 "--judge-model", "gpt-5.6-terra",
                 "--judge-model", "claude-sonnet-5",
                 "--judge-model", "kimi-k3",
+                env={**os.environ, "OPENCODE_API_KEY": "test-secret-must-not-be-recorded"},
             )
             self.assertEqual(len(server.requests), 72)
             self.assertEqual(
@@ -382,6 +401,7 @@ class BenchmarkToolsTests(unittest.TestCase):
             )
 
         record = json.loads((votes / "votes.json").read_text())
+        self.assertNotIn("test-secret-must-not-be-recorded", (votes / "votes.json").read_text())
         self.assertEqual(len(record["requests"]), 72)
         self.assertEqual(record["summary"]["valid_votes"], 48)
         self.assertEqual(record["summary"]["invalid_or_failed"], 24)
@@ -395,6 +415,29 @@ class BenchmarkToolsTests(unittest.TestCase):
         self.assertTrue(all(item["verdict"] is None and item["error"] for item in invalid))
         valid = [item for item in record["requests"] if item["judge_model"] == "gpt-5.6-terra"]
         self.assertTrue(all(item["raw_response"] and item["requested_at"] for item in valid))
+
+    def test_pairwise_grading_requires_an_explicit_compatible_gateway(self):
+        _course, prepared = self.prepared_fixture()
+        candidates = self.temp / "candidates"
+        candidates.mkdir()
+        for number in range(12):
+            (candidates / ("benchmark%02d.md" % number)).write_text("summary")
+
+        completed = self.command(
+            GRADE,
+            "--manifest", prepared / "manifest.json",
+            "--candidate-a", candidates,
+            "--candidate-b", candidates,
+            "--output", self.temp / "votes",
+            "--judge-model", "gpt-5.6-terra",
+            "--judge-model", "claude-sonnet-5",
+            "--judge-model", "kimi-k3",
+            check=False,
+        )
+
+        self.assertEqual(completed.returncode, 2)
+        self.assertIn("--endpoint", completed.stderr)
+        self.assertFalse((self.temp / "votes").exists())
 
 
 if __name__ == "__main__":
