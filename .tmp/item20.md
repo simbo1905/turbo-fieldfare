@@ -2,7 +2,7 @@
 
 ## Status
 
-Pending items 18 and 19.
+Completed on 2026-08-05.
 
 ## Objective
 
@@ -62,8 +62,19 @@ state remains preserved by `summarisation-cli-high-water-2026-08-05`.
 
 ## Completion criteria
 
-- [ ] Private final report is complete and internally consistent.
-- [ ] PR validation section contains the real-model stock CLI run.
-- [ ] Public sanitization scan passes.
-- [ ] Draft status is removed and PR 93 is marked ready for review.
-- [ ] Final issue/PR/tag/commit URLs and test outcomes are reported to the user.
+- [x] Private final report is complete and internally consistent.
+- [x] PR validation section contains the real-model stock CLI run.
+- [x] Public sanitization scan passes.
+- [x] Draft status is removed and PR 93 is marked ready for review.
+- [x] Final issue/PR/tag/commit URLs and test outcomes are reported to the user.
+
+## Completion record
+
+- Published Gist: `https://gist.github.com/simbo1905/6ec2912e544cf7a7f361ba0b5de90935`.
+- README and `metrics.json` content hashes were verified against the published
+  revision after update.
+- PR: `https://github.com/drumih/turbo-fieldfare/pull/93`.
+- Issue: `https://github.com/drumih/turbo-fieldfare/issues/92`.
+- PR 93 was marked ready after its validation text was updated.
+- Private output, source, raw judge responses, and private paths remain only
+  under `.tmp` and were excluded from all public reporting.
