@@ -105,4 +105,6 @@ jq '{backend, chunk, context, series, warmup, exit_code, wall_seconds, peak_rss_
 
 Prepared the ten anonymous context-pairwise choices for the largest selected chunk. The one-shot comparison tool passed its fake HTTP contract test. No compatible judge endpoint was configured, so no external judge request was made.
 
+Context quality-panel smoke: one private comparison of the anonymous largest selected chunk’s TurboFieldfare 4K and 64K summaries. The judges were `gpt-5.6-terra`, `claude-sonnet-5`, and `kimi-k3`. A decisive A/B vote is worth two points to that candidate; an equivalent/TIE vote is one point each. The private panel result was `valid=0`, `decisive=0`, `equivalent=0`, `failed=3`, and `aggregate=unscored`: each judge request received HTTP 403 before a verdict. Raw source text, summaries, keys, request payloads, and responses remain only in ignored private artifacts.
+
 Final publication: a privacy-scanned aggregate report was published as a secret Gist. It contains only anonymous chunk identifiers, aggregate measurements, per-run repository commit provenance, and the factual quality-gate outcome: six HTTP 403 judge attempts and zero verdicts. It excludes source material, summaries, prompts, paths, raw logs, keys, and output hashes. The published raw files were fetched through the GitHub API and matched the scanned local report exactly.
