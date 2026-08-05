@@ -24,3 +24,13 @@ ollama chunk=00 context=4096 status=ok wall_seconds=55.952 peak_rss_mib=18517.4 
 ```
 
 Item 14 completed: the one discarded native-default Ollama warmup returned exit 0 after 55.952 seconds; sampled peak apparent RSS was 18517.4 MiB. The warmup generated no measured candidate. The local Ollama owner was confirmed clear before this notebook was staged.
+
+Item 15: run exactly one measured native-default Ollama summary for anonymous chunk 00. Immediately before launch, the runner repeats the complete AGENTS.md gate. No Ollama sampling or context options are supplied; the runner owns a finite-timeout process group.
+
+```bash
+uv run --script summarisation/showboat/private_benchmark.py measure ollama 0
+```
+
+```output
+ollama chunk=00 context=4096 status=ok wall_seconds=48.352 peak_rss_mib=18564.3 memory_free_before=76 memory_free_after=9
+```
