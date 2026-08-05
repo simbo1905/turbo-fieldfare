@@ -49,7 +49,7 @@ review08. [done] Record complete private measurement provenance and publish only
 29. [done] Largest private chunk, TurboFieldfare context 16384.
 30. [done] Largest private chunk, TurboFieldfare context 32768.
 31. [done] Largest private chunk, TurboFieldfare context 65536.
-32. Prepare local blinded pairs: 4K baseline versus each context candidate.
+32. [done] Prepare the ten private context-pairwise choices and the one-shot three-judge spot-check command.
 33. Record authorized local blind-pair ratings and aggregate wins/ties.
 34. Produce public report, privacy audit, append final notebook, stage, publish,
     and revision-verify the sanitized Gist.

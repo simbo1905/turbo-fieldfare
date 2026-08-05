@@ -102,3 +102,5 @@ jq '{backend, chunk, context, series, warmup, exit_code, wall_seconds, peak_rss_
   "runner_error": null
 }
 ```
+
+Prepared the ten anonymous context-pairwise choices for the largest selected chunk. The one-shot comparison tool passed its fake HTTP contract test. No compatible judge endpoint was configured, so no external judge request was made.
