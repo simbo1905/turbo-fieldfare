@@ -4,8 +4,20 @@ No model run has occurred. Every item must be executed independently, through
 Showboat, with its own task/subagent, finite timeout, resource check, and
 `git add -f .tmp/gemma4-comparison.showboat.md` after a successful append.
 
-00. Bootstrap private config, privacy-safe preflight, initialize notebook.
-01. Prepare corpus; TurboFieldfare discarded warmup on chunk 00.
+Review remediation gates (complete with Red/Green tests before item 00):
+
+review00. [done] Give Ollama the exact same summary instruction as TurboFieldfare.
+review01. [done] Run the complete AGENTS.md preflight immediately before every model invocation.
+review02. [done] On timeout, terminate the entire owned backend process group with a kill fallback.
+review03. [done] Redact filesystem failures at the public Showboat boundary while retaining private diagnostics.
+review04. [done] Refuse a reused/non-empty generic benchmark result directory and stale outputs.
+review05. [done] Preserve the generic run manifest but return nonzero if any backend chunk fails.
+review06. [done] Require an explicit multi-provider-compatible endpoint for GPT, Claude, and Kimi judges.
+review07. [done] Resolve tool siblings correctly in both repository and flat-Gist layouts.
+review08. [done] Record complete private measurement provenance and publish only sanitized provenance.
+
+00. [done] Bootstrap private config, privacy-safe preflight, initialize notebook.
+01. [done] Prepare corpus; TurboFieldfare discarded warmup on chunk 00.
 02. TurboFieldfare measured chunk 00.
 03. TurboFieldfare measured chunk 01.
 04. TurboFieldfare measured chunk 02.
@@ -41,5 +53,7 @@ Showboat, with its own task/subagent, finite timeout, resource check, and
 34. Produce public report, privacy audit, append final notebook, stage, publish,
     and revision-verify the sanitized Gist.
 
-Prompt mapping: `item00.md`, `item01.md`, `items02-13.md`, `item14.md`,
+Review prompt mapping: `review00.md` through `review08.md`.
+
+Execution prompt mapping: `item00.md`, `item01.md`, `items02-13.md`, `item14.md`,
 `items15-26.md`, `items27-31.md`, `item32.md`, `item33.md`, `item34.md`.

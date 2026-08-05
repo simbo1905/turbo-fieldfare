@@ -18,6 +18,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--base-url", default="http://127.0.0.1:11434")
     parser.add_argument("--model", default="gemma4:26b")
+    parser.add_argument("--prompt", required=True)
     args = parser.parse_args(argv)
     if args.input.is_dir():
         inputs = sorted(path for path in args.input.glob("benchmark*.md") if path.is_file())
@@ -37,7 +38,8 @@ def main(argv: list[str] | None = None) -> int:
 
     endpoint = args.base_url.rstrip("/") + "/api/generate"
     for source, destination in zip(inputs, output_paths):
-        payload = json.dumps({"model": args.model, "prompt": source.read_text(encoding="utf-8"), "stream": True}).encode()
+        prompt = args.prompt + "\n\n" + source.read_text(encoding="utf-8")
+        payload = json.dumps({"model": args.model, "prompt": prompt, "stream": True}).encode()
         request = urllib.request.Request(endpoint, data=payload, headers={"Content-Type": "application/json"}, method="POST")
         pieces: list[str] = []
         with urllib.request.urlopen(request) as response:
