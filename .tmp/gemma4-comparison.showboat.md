@@ -160,3 +160,13 @@ uv run --script summarisation/showboat/private_benchmark.py measure turbofieldfa
 ```output
 turbofieldfare chunk=11 context=4096 status=ok wall_seconds=80.644 peak_rss_mib=1570.0 memory_free_before=46 memory_free_after=41
 ```
+
+Item 28: one TurboFieldfare context sweep measurement of the private largest chunk at 8192 context. Sampling configuration remains unchanged; the action repeats the complete model gate and owns a finite process-group timeout.
+
+```bash
+uv run --script summarisation/showboat/private_benchmark.py measure turbofieldfare --largest --context 8192 --series sweep
+```
+
+```output
+turbofieldfare chunk=06 context=8192 status=ok wall_seconds=58.032 peak_rss_mib=1667.0 memory_free_before=68 memory_free_after=66
+```
