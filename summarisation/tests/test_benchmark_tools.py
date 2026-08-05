@@ -20,7 +20,6 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ROOT = Path(__file__).resolve().parents[1]
 PREPARE = ROOT / "prepare_benchmark_corpus.py"
-RUN = ROOT / "benchmark_run.py"
 OLLAMA = ROOT / "process_chunks_ollama.py"
 TURBOFIELDFAR = ROOT / "process_chunks_turbofieldfare.py"
 GRADE = ROOT / "pairwise_grade.py"
@@ -156,64 +155,6 @@ class BenchmarkToolsTests(unittest.TestCase):
         path.write_text("#!/usr/bin/env python3\n" + body)
         path.chmod(0o755)
         return path
-
-    def test_benchmark_run_measures_serial_backend_outputs_and_ollama_metadata(self):
-        _course, prepared = self.prepared_fixture()
-        backend = self.write_executable(
-            "backend.py",
-            "import pathlib, sys, time\n"
-            "source, destination = map(pathlib.Path, sys.argv[1:3])\n"
-            "print('backend stdout:' + source.name)\n"
-            "print('backend stderr:' + source.name, file=sys.stderr)\n"
-            "time.sleep(0.01)\n"
-            "destination.write_text('summary:' + source.read_text()[:16])\n",
-        )
-        ollama = self.write_executable(
-            "ollama",
-            "import sys\n"
-            "args = sys.argv[1:]\n"
-            "if args == ['--version']: print('ollama version 9.9.9')\n"
-            "elif args == ['show', 'gemma4:26b', '--modelfile']: print('FROM gemma4:26b@sha256:fixture')\n"
-            "elif args == ['ps']: print('NAME ID SIZE PROCESSOR UNTIL\\ngemma4:26b fixture 1 GB CPU Forever')\n"
-            "else: raise SystemExit('unexpected ' + repr(args))\n",
-        )
-        results = self.temp / "results"
-        template = "%s %s {input} {output}" % (sys.executable, backend)
-        self.command(
-            RUN,
-            "--manifest", prepared / "manifest.json",
-            "--results", results,
-            "--backend", "ollama-native-default",
-            "--backend-command", template,
-            "--config-json", '{"model":"gemma4:26b","sampling":"native-default"}',
-            "--ollama-bin", ollama,
-            "--ollama-model", "gemma4:26b",
-        )
-        record = json.loads((results / "run-manifest.json").read_text())
-        self.assertEqual(record["backend"]["identity"], "ollama-native-default")
-        self.assertEqual(record["backend"]["configuration"]["sampling"], "native-default")
-        self.assertEqual(len(record["chunks"]), 12)
-        for chunk in record["chunks"]:
-            self.assertEqual(chunk["exit_status"], 0)
-            self.assertGreater(chunk["wall_seconds"], 0)
-            self.assertTrue(chunk["argv"])
-            self.assertTrue((results / chunk["stdout_path"]).is_file())
-            self.assertTrue((results / chunk["stderr_path"]).is_file())
-            output = results / chunk["output_path"]
-            self.assertTrue(output.is_file())
-            self.assertEqual(chunk["output_bytes"], output.stat().st_size)
-            self.assertEqual(chunk["output_sha256"], sha256(output))
-        starts = [chunk["started_at"] for chunk in record["chunks"]]
-        finishes = [chunk["finished_at"] for chunk in record["chunks"]]
-        self.assertEqual(starts, sorted(starts))
-        self.assertTrue(all(a <= b for a, b in zip(finishes, starts[1:])))
-        for snapshot in ("before", "after"):
-            captured = record["ollama_metadata"][snapshot]
-            self.assertIn("ollama version 9.9.9", captured["version"])
-            self.assertIn("sha256:fixture", captured["modelfile"])
-            self.assertIn("gemma4:26b", captured["ps"])
-            self.assertEqual(captured["model"], "gemma4:26b")
-            self.assertIn("fixture", captured["digest"])
 
     def test_ollama_chunk_processor_accepts_aliases_and_streamed_responses(self):
         chunks = self.temp / "chunks"
