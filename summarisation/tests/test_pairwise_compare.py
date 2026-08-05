@@ -16,14 +16,21 @@ TOOL = ROOT / "pairwise_compare.py"
 
 
 class PairwiseCompareTests(unittest.TestCase):
-    def test_three_judges_receive_the_same_two_candidates_and_scores_are_aggregated(self):
-        received: list[dict] = []
+    def test_three_judges_use_documented_provider_paths_and_scores_are_aggregated(self):
+        received: list[tuple[str, dict, dict[str, str]]] = []
 
         class Handler(BaseHTTPRequestHandler):
             def do_POST(self):  # noqa: N802
                 size = int(self.headers["Content-Length"])
-                received.append(json.loads(self.rfile.read(size)))
-                body = json.dumps({"choices": [{"message": {"content": "A"}}]}).encode()
+                request = json.loads(self.rfile.read(size))
+                received.append((self.path, request, dict(self.headers)))
+                if self.path.endswith("/responses"):
+                    response = {"output_text": "A"}
+                elif self.path.endswith("/messages"):
+                    response = {"content": [{"type": "text", "text": "TIE"}]}
+                else:
+                    response = {"choices": [{"message": {"content": "B"}}]}
+                body = json.dumps(response).encode()
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")
                 self.send_header("Content-Length", str(len(body)))
@@ -43,7 +50,7 @@ class PairwiseCompareTests(unittest.TestCase):
                 source.write_text("SOURCE FIXTURE")
                 a.write_text("A FIXTURE")
                 b.write_text("B FIXTURE")
-                completed = subprocess.run([sys.executable, str(TOOL), "--source", str(source), "--summary-a", str(a), "--summary-b", str(b), "--output", str(output), "--endpoint", f"http://127.0.0.1:{server.server_port}/v1/chat/completions"], cwd=ROOT, env={"OPENCODE_API_KEY": "fixture-secret"}, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                completed = subprocess.run([sys.executable, str(TOOL), "--source", str(source), "--summary-a", str(a), "--summary-b", str(b), "--output", str(output), "--zen-base-url", f"http://127.0.0.1:{server.server_port}/v1"], cwd=ROOT, env={"OPENCODE_API_KEY": "fixture-secret"}, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 self.assertEqual(completed.returncode, 0, completed.stderr)
                 output_text = output.read_text()
                 result = json.loads(output_text)
@@ -51,9 +58,12 @@ class PairwiseCompareTests(unittest.TestCase):
             server.shutdown()
             thread.join()
             server.server_close()
-        self.assertEqual([request["model"] for request in received], ["gpt-5.6-terra", "claude-sonnet-5", "kimi-k3"])
-        self.assertTrue(all("SOURCE FIXTURE" in request["messages"][0]["content"] and "A FIXTURE" in request["messages"][0]["content"] and "B FIXTURE" in request["messages"][0]["content"] for request in received))
-        self.assertEqual(result["aggregate"], {"score_a": 6, "score_b": 0, "verdict": "A"})
+        self.assertEqual([path for path, _request, _headers in received], ["/v1/responses", "/v1/messages", "/v1/chat/completions"])
+        self.assertEqual([request["model"] for _path, request, _headers in received], ["gpt-5.6-terra", "claude-sonnet-5", "kimi-k3"])
+        prompts = [request.get("input") or request["messages"][0]["content"] for _path, request, _headers in received]
+        self.assertTrue(all("SOURCE FIXTURE" in prompt and "A FIXTURE" in prompt and "B FIXTURE" in prompt for prompt in prompts))
+        self.assertEqual(received[1][2]["Anthropic-Version"], "2023-06-01")
+        self.assertEqual(result["aggregate"], {"score_a": 3, "score_b": 3, "verdict": "TIE"})
         self.assertNotIn("SOURCE FIXTURE", output_text)
 
 
