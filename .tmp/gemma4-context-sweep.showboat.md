@@ -49,3 +49,13 @@ jq '{backend, chunk, context, series, warmup, exit_code, wall_seconds, peak_rss_
   "runner_error": null
 }
 ```
+
+Item 28: one TurboFieldfare context sweep measurement of the private largest chunk at 8192 context. Sampling configuration remains unchanged; the action repeats the complete model gate and owns a finite process-group timeout.
+
+```bash
+uv run --script summarisation/showboat/private_benchmark.py measure turbofieldfare --largest --context 8192 --series sweep
+```
+
+```output
+turbofieldfare chunk=06 context=8192 status=ok wall_seconds=58.032 peak_rss_mib=1667.0 memory_free_before=68 memory_free_after=66
+```
