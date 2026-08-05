@@ -1,9 +1,0 @@
-{
-  "format": "turbofieldfare-published-benchmark-results-v1",
-  "gist_url": "https://gist.github.com/simbo1905/6ec2912e544cf7a7f361ba0b5de90935",
-  "gist_revision": "ad29164514073f30aaba93c740cffcd30d144d2f",
-  "visibility": "secret",
-  "files": ["README.md", "metrics.csv", "metrics.json"],
-  "raw_content_verification": "all three published raw files match their privacy-scanned local sources",
-  "quality_spot_check": "six HTTP 403 attempts; zero valid verdicts; no quality score claimed"
-}
